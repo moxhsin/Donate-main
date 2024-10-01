@@ -159,19 +159,7 @@ const Navbar = ({ history })  => {
    // Retrieve user data from local storage
    const userData = JSON.parse(sessionStorage.getItem('userData'));
    const isAdmin = userData ? userData.isAdmin : false;
-
-   const handleClick = () => {
-      const userData = sessionStorage.getItem('userData');
-
-      if (userData) {
-          // User is logged in, navigate to create-campaign
-          window.location.href = '/create-campaign';
-      } else {
-          // User is not logged in, redirect to login
-          window.location.href = '/login';
-      }
-    };
-
+  
    const handleLogout = () => {
       // Remove userData from sessionStorage
       sessionStorage.removeItem('userData');
@@ -187,7 +175,7 @@ const Navbar = ({ history })  => {
                <MenuButton onClick={toggleNav}>☰</MenuButton>
                <MenuItems isOpen={isOpen}>
                    <NavLink to="/">Home</NavLink>
-                   <NavLink to="#" onClick={handleClick}>Start a Fundraiser</NavLink>
+                   <NavLink to="/create-campaign">Start a Fundraiser</NavLink>
                    <NavLink to="/donate">Donate</NavLink>
                    {/* Conditionally render Review Campaigns link */}
                    {isAdmin && <NavLink to="/reviewCampaigns">Review Campaigns</NavLink>}
