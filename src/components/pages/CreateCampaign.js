@@ -149,7 +149,7 @@ const CreateCampaign = () => {
                 createdUsername: userData.name,
             }));
         } else {
-            window.location.href = '/login';
+            // window.location.href = '/login';
         }
     }, []);
 
