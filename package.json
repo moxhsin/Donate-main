@@ -2,7 +2,6 @@
   "name": "donation-app---project-3",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
   "engines": {
     "node": "20.x",
     "npm": "6.12.0"
