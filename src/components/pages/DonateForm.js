@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Table, Button, Form, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Button, Modal } from 'react-bootstrap';
 import API from './../../utils/API'; // Adjust the import path as necessary
 import Loading from './../../utils/Loading';
-import formatDate from './../../utils/DateFormatter';
+import styled from 'styled-components';
+import { Redirect } from 'react-router-dom';
 
 const Theme = {
     fontPrimary: "'Poppins', sans-serif",
@@ -16,18 +17,42 @@ const Theme = {
     textDark: '#A0A0A0',
 };
 
+const CampaignCard = styled.div`
+  cursor: pointer;
+  background-color: ${Theme.surface};
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  
+  /* Set fixed width and height */
+  width: 300px; /* Set your desired width */
+  height: 400px; /* Set your desired height */
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
+`;
+
 const DonateForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [donateForm, setDonateForm] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [donorName, setDonorName] = useState('Anonymous');
-    const [amountDonated, setAmountDonated] = useState(Array(donateForm.length).fill(''));
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         loadCampaigns();
-        setDonorNameFromSession(); // Set donor name after component mounts
     }, []); // Empty dependency array means this runs once on mount
+
+    const [redirectId, setRedirectId] = useState(null);
+
+    const handleCardClick = (id) => {
+        setRedirectId(id);
+    };
+
+    if (redirectId) {
+        return <Redirect to={`/donate-details/${redirectId}`} />;
+    }
 
     const loadCampaigns = async () => {
         setIsLoading(true);
@@ -42,38 +67,7 @@ const DonateForm = () => {
         }
     };
 
-    const handleInputChange = (index, event) => {
-        const newAmountDonated = [...amountDonated];
-        newAmountDonated[index] = event.target.value; // Update only the specific index
-        setAmountDonated(newAmountDonated);
-    };
-
-    const handleDonationSubmit = async (id, index) => {
-        try {
-            const amount = amountDonated[index];
-            await API.donateToCampaign(id, { donorName, amount: amount });
-            // Refresh campaigns after successful donation
-            await loadCampaigns(); // Load updated campaign data
-            setAmountDonated(''); // Reset input field after donation
-            // Optionally show success message here
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleDonationSuccess = (id, index) => {
-        handleDonationSubmit(id, index);
-        setShowModal(true); // Show the modal on successful donation
-    };
-
     const handleClose = () => setShowModal(false);
-
-    // Method to set donor name based on login status
-    const setDonorNameFromSession = () => {
-        const userObject = JSON.parse(sessionStorage.getItem('userData'));
-        const name = userObject && userObject.name ? userObject.name : 'Anonymous';
-        setDonorName(name);
-    };
 
     return (
         <Container fluid style={{ backgroundColor: Theme.background, color: Theme.text }}>
@@ -84,84 +78,32 @@ const DonateForm = () => {
                     <Col size="md-6 sm-12">
                         {donateForm.length ? (
                             <div>
-                                <h1 style={{ fontWeight: "900", textAlign: "center", margin: "110px 0px 20px", fontFamily: Theme.fontPrimary, color: '#C9A86A' }}>
+                                <h1 style={{ fontWeight: "900", textAlign: "center", margin: "110px 0px 20px", fontFamily: Theme.fontPrimary, color: Theme.primary }}>
                                     All Active Campaigns
                                 </h1>
-                                <Table striped bordered hover variant="dark">
-                                    <thead>
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Description</th>
-                                            <th>Amount Raised</th>
-                                            <th>Amount Remaining</th>
-                                            <th>Top Donor</th>
-                                            <th>Created By</th>
-                                            <th>Created On</th>
-                                            <th>Enter Donation</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {donateForm.map(({ _id, title, description, amountRaised, remainingAmount, donations, createdUsername, createdUserEmail, createdOn }, index) => {
-                                            // Find the top donor
-                                            const topDonor = donations.length > 0 
-                                                ? donations.reduce((prev, current) => (prev.amount > current.amount) ? prev : current) 
-                                                : null;
-
-                                            return (
-                                                <tr key={_id}>
-                                                    <td>{title}</td>
-                                                    <td>{description}</td>
-                                                    <td>{amountRaised}</td>
-                                                    <td>{remainingAmount}</td>
-                                                    <td>
-                                                        {topDonor ? (
-                                                            <React.Fragment>
-                                                                {topDonor.donorName}<br />
-                                                                <span style={{ fontStyle: 'italic', color: '#C9A86A' }}>
-                                                                    (${topDonor.amount})
-                                                                </span>
-                                                            </React.Fragment>
-                                                        ) : (
-                                                            'No Top Donor'
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        {createdUsername}<br />
-                                                        <span style={{ fontStyle: 'italic', color: '#C9A86A' }}>
-                                                            ({createdUserEmail})
-                                                        </span>
-                                                    </td>
-                                                    <td>{formatDate(createdOn)}</td>
-                                                    <td>
-                                                        <Form.Control
-                                                            type="text"
-                                                            value={amountDonated[index]} // Bind to specific index
-                                                            onChange={(event) => handleInputChange(index, event)} // Pass index to handler
-                                                            placeholder='Amount'
-                                                        />
-                                                    </td>
-                                                    <td>
-                                                        <Button 
-                                                            variant="success" 
-                                                            style={{ borderRadius: '5px', padding: '10px 20px', fontWeight: 'bold' }} 
-                                                            onClick={() => handleDonationSuccess(_id, index)}
-                                                        >
-                                                            Donate
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </Table>
+                                    <div className="d-flex flex-wrap justify-content-center">
+                                        {donateForm.map(({ _id, title }) => (
+                                            <div key={_id} style={{ margin: '10px' }} onClick={() => handleCardClick(_id)}>
+                                                <CampaignCard>
+                                                    <div style={{ padding: '20px', cursor: 'pointer' }}>
+                                                        <h5 style={{
+                                                            fontFamily: Theme.fontSecondary,
+                                                            fontSize: '1.5rem',
+                                                            marginBottom: '1rem',
+                                                            color: Theme.primary
+                                                        }}>
+                                                            {title}
+                                                        </h5>
+                                                    </div>
+                                                </CampaignCard>
+                                            </div>
+                                        ))}
+                                    </div>
 
                                 {/* Modal for Donation Success */}
                                 <Modal show={showModal} onHide={handleClose} centered style={{ backgroundColor: Theme.background }}>
                                     <Modal.Body style={{ textAlign: 'center', backgroundColor: Theme.background }}>
-                                        <h4 style={{ color: '#C9A86A' }}>Thanks for your donation!</h4>
-                                        {/* Animated Smiley */}
-                                        {/* <FaSmile size={50} className="animate__animated animate__bounce" /> */}
+                                        <h4 style={{ color: Theme.primary }}>Thanks for your donation!</h4>
                                         <Button variant="outline-dark" onClick={handleClose} style={{ marginTop: '20px' }}>
                                             Close
                                         </Button>
