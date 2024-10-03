@@ -3,8 +3,11 @@ import axios from "axios";
 const BASEURL =
   "https://api.data.charitynavigator.org/v2/Organizations?app_id=3c0fc420&app_key=0c12428e18e7fb50a1af2d2a834c2eaf&pageSize=25&search=";
 
-const BASEURL_CAMPAIGN = 'https://donate-backend-alpha.vercel.app/api/campaigns';
-const BASEURL_USER = 'https://donate-backend-alpha.vercel.app/api';
+// const BASEURL_CAMPAIGN = 'https://donate-backend-alpha.vercel.app/api/campaigns';
+// const BASEURL_USER = 'https://donate-backend-alpha.vercel.app/api';
+
+const BASEURL_CAMPAIGN = 'http://localhost:4000/api/campaigns';
+const BASEURL_USER = 'http://localhost:4000/api';
 export default {
   searchnews: function (query) {
     return axios.get(
@@ -43,6 +46,14 @@ export default {
 
   donateToCampaign: function(id, donationData) {
     return axios.post(BASEURL_CAMPAIGN + "/donate/" + id, donationData)
+  },
+
+  addCommentInCampaign: function(id, commentData) {
+    return axios.post(BASEURL_CAMPAIGN + "/comment/" + id, commentData)
+  },
+
+  getCampaignComments: function(id) {
+    return axios.get(BASEURL_CAMPAIGN + "/comments/" + id)
   },
 
   approveCampaign: function(id) {
