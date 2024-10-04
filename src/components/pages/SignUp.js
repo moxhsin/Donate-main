@@ -140,7 +140,7 @@ const SignUp = ({ history }) => {
 
    return (
        <FullPageBackground>
-           <BackgroundVideo autoPlay loop muted>
+           <BackgroundVideo autoPlay loop muted playsInline>
                <source src={video} type="video/mp4" />
                Your browser does not support the video tag.
            </BackgroundVideo>

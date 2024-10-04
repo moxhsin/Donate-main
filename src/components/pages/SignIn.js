@@ -122,7 +122,7 @@ const SignIn = (props) => {
 
     return (
         <FullPageBackground>
-            <BackgroundVideo autoPlay loop muted>
+            <BackgroundVideo autoPlay loop muted playsInline>
                 <source src={video} type="video/mp4"/>
             </BackgroundVideo>
             <Container>
