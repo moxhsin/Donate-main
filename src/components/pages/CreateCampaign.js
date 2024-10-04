@@ -3,6 +3,7 @@ import { Form, Button, Modal } from 'react-bootstrap';
 import { Link, Redirect } from "react-router-dom";
 import styled from 'styled-components';
 import API from "../../utils/API";
+import ImageUpload from '../../utils/ImageUpload';
 
 const Theme = {
     fontPrimary: "'Poppins', sans-serif",
@@ -132,13 +133,13 @@ const CreateCampaign = () => {
         agreementAccepted: false,
         createdUsername: '',
         createdUserEmail: '',
+        image: ''
     });
 
     const [showModal, setShowModal] = useState(false);
     const [showAgreementModal, setShowAgreementModal] = useState(false);
 
-    const [createdUserEmail, setCreatedUserEmail] = useState('');
-    const [createdUsername, setCreatedUsername] = useState('');
+    const [image, setImage] = useState("");
 
     useEffect(() => {
         const userData = JSON.parse(sessionStorage.getItem("userData"));
@@ -152,6 +153,14 @@ const CreateCampaign = () => {
             // window.location.href = '/login';
         }
     }, []);
+
+    const handleImageUpload = (url) => {
+        setImage(url);
+        setFormData((prevState) => ({
+            ...prevState,
+            image: url, // Update the image property in formData
+        }));
+    };
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -259,6 +268,18 @@ const CreateCampaign = () => {
                             placeholder="Enter your fundraising goal"
                         />
                     </StyledFormGroup>
+
+                    <StyledFormGroup>
+                        <StyledFormLabel>Upload an image for your campaign</StyledFormLabel>
+                        <ImageUpload onImageUpload={handleImageUpload}/>
+                        {image && (
+                            <div>
+                                <h2>Uploaded Image:</h2>
+                                <img src={image} alt="Uploaded Campaign" style={{ width: '400px' }} />
+                            </div>
+                        )}
+                    </StyledFormGroup>
+                    
                 </FormSection>
 
                 <FormSection>

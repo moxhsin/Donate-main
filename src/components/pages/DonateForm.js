@@ -33,6 +33,28 @@ const CampaignCard = styled.div`
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   }
+
+  img {
+    width: 100%; /* Make image take full width */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 200px; /* Limit max height for image */
+    object-fit: cover; /* Cover the area without distortion */
+  }
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 10px;
+  background-color: ${Theme.background};
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+`;
+
+const Progress = styled.div`
+  width: ${props => props.percent}%;
+  height: 100%;
+  background-color: red; // Set to red color as requested
 `;
 
 const DonateForm = () => {
@@ -82,22 +104,33 @@ const DonateForm = () => {
                                     All Active Campaigns
                                 </h1>
                                     <div className="d-flex flex-wrap justify-content-center">
-                                        {donateForm.map(({ _id, title }) => (
-                                            <div key={_id} style={{ margin: '10px' }} onClick={() => handleCardClick(_id)}>
-                                                <CampaignCard>
-                                                    <div style={{ padding: '20px', cursor: 'pointer' }}>
-                                                        <h5 style={{
-                                                            fontFamily: Theme.fontSecondary,
-                                                            fontSize: '1.5rem',
-                                                            marginBottom: '1rem',
-                                                            color: Theme.primary
-                                                        }}>
-                                                            {title}
-                                                        </h5>
-                                                    </div>
-                                                </CampaignCard>
-                                            </div>
-                                        ))}
+                                        {donateForm.map(({ _id, title, image, goal, remainingAmount }) => {
+                                            // Calculate total amount and percentage outside of the return statement
+                                            const totalAmount = goal - remainingAmount;
+                                            const percent = Math.max(0, Math.min(100, (totalAmount / goal) * 100));
+
+                                            return (
+                                                <div key={_id} style={{ margin: '10px' }} onClick={() => handleCardClick(_id)}>
+                                                    <CampaignCard>
+                                                        {image && <img src={image} alt={title} />}
+                                                        <div style={{ padding: '20px', cursor: 'pointer' }}>
+                                                            <h5 style={{
+                                                                fontFamily: Theme.fontSecondary,
+                                                                fontSize: '1.5rem',
+                                                                marginBottom: '1rem',
+                                                                color: Theme.primary
+                                                            }}>
+                                                                {title}
+                                                            </h5>
+                                                            <p>Goal: {goal}</p>
+                                                            <ProgressBar>
+                                                                <Progress percent={percent} />
+                                                            </ProgressBar>
+                                                        </div>
+                                                    </CampaignCard>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
 
                                 {/* Modal for Donation Success */}

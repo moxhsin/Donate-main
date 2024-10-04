@@ -12,6 +12,7 @@ const DonateDetails = ({ match }) => {
     const [donationAmount, setDonationAmount] = useState('');
     const [comments, setComments] = useState([]); // State for comments
     const [newComment, setNewComment] = useState(''); // State for new comment
+    const [topDonor, setTopDonor] = useState(null);
 
     useEffect(() => {
         loadCampaignDetails();
@@ -30,6 +31,13 @@ const DonateDetails = ({ match }) => {
             const campaignDetails = res.data.find(campaign => campaign._id === id); // Find specific campaign by ID
             if (campaignDetails) {
                 setCampaign(campaignDetails);
+                const donations = campaignDetails.donations || []; // Ensure donations is an array
+                const topDonor = donations.reduce((max, donor) => 
+                    donor.amount > max.amount ? donor : max, 
+                    { amount: 0 }
+                );
+
+                setTopDonor(topDonor.amount > 0 ? topDonor : null);
             } else {
                 console.error('Campaign not found');
             }
@@ -112,110 +120,143 @@ const DonateDetails = ({ match }) => {
    return (
        <Container fluid style={{ backgroundColor: '#0F1419', color: '#F2F2F2', padding: '20px' }}> {/* Added marginTop */}
            <Row className="justify-content-center" style={{ marginTop: '150px' }}>
-               <Col md={8}>
-                   <div style={{
-                       display: 'flex',
-                       justifyContent: 'space-between',
-                       alignItems: 'flex-start',
-                       marginBottom: '20px',
-                   }}>
-                       {/* Title and Description as Plain Text on the Left */}
-                       <div style={{ flex: 1 }}>
-                           <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#C9A86A' }}>{campaign.title}</h3>
-                           <p style={{ marginBottom: '10px' }}><strong>Description:</strong> {campaign.description}</p>
-                       </div>
+           <Col md={8}>
+    <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: '20px',
+    }}>
+        {/* Title and Description on the Left */}
+        <div style={{ flex: 1 }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#C9A86A' }}>{campaign.title}</h3>
+            
+            {/* Square Box for Image (Increased Size) */}
+            <div style={{
+                width: '300px', // Increased width by 50%
+                height: '300px', // Increased height by 50%
+                overflow: 'hidden', // Hide overflow
+                borderRadius: '12px', // Optional: rounded corners for the box
+                marginBottom: '10px',
+                display: 'flex', // Use flexbox to center the image
+                justifyContent: 'center', // Center horizontally
+                alignItems: 'center', // Center vertically
+                marginLeft: '27%'
+            }}>
+                {campaign.image && (
+                    <img 
+                        src={campaign.image} 
+                        alt={campaign.title} 
+                        style={{
+                            maxWidth: '100%', // Ensure the image does not exceed box width
+                            maxHeight: '100%', // Ensure the image does not exceed box height
+                            objectFit: 'cover', // Cover the box without distortion
+                            borderRadius: '12px' // Curved edges for the image
+                        }} 
+                    />
+                )}
+            </div>
 
-                       {/* Donation Details Card on the Right */}
-                       <div style={{
-                           padding: '20px',
-                           borderRadius: '12px',
-                           backgroundColor: '#1E2328',
-                           boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
-                           width: '300px'
-                       }}>
-                           <p><strong>Amount Raised:</strong> ${campaign.amountRaised}</p>
-                           <p><strong>Goal:</strong> ${campaign.goal}</p>
+            <p style={{ marginBottom: '10px' }}><strong>Description:</strong> {campaign.description}</p>
+        </div>
 
-                           {/* Donor Input Form */}
-                           <Form>
-                               <Form.Group controlId="donorName">
-                                   <Form.Label>Donor Name</Form.Label>
-                                   <Form.Control 
-                                       type="text" 
-                                       placeholder="Enter your name" 
-                                       value={donorName} 
-                                       readOnly 
-                                       style={{ backgroundColor: '#2B3036', color: '#F2F2F2', borderColor: '#C9A86A' }}
-                                   />
-                               </Form.Group>
+        {/* Donation Details Card on the Right */}
+        <div style={{
+            padding: '20px',
+            borderRadius: '12px',
+            backgroundColor: '#1E2328',
+            boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
+            width: '300px'
+        }}>
+            <p><strong>Amount Raised:</strong> ${campaign.amountRaised}</p>
+            <p><strong>Goal:</strong> ${campaign.goal}</p>
 
-                               <Form.Group controlId="donationAmount">
-                                   <Form.Label>Donation Amount ($)</Form.Label>
-                                   <Form.Control 
-                                       type="number" 
-                                       placeholder="Enter amount" 
-                                       value={donationAmount} 
-                                       onChange={(e) => setDonationAmount(e.target.value)} 
-                                       onWheel={(e) => e.preventDefault()} 
-                                       min="0" 
-                                       style={{ appearance: 'none', MozAppearance: 'textfield', backgroundColor: '#2B3036', color: '#F2F2F2', borderColor: '#C9A86A' }} 
-                                   />
-                               </Form.Group>
+            {topDonor && (
+                                   <div style={{ marginBottom: '15px', color: '#F2F2F2' }}>
+                                       <strong>Top Donor:</strong> {topDonor.donorName} - ${topDonor.amount}
+                                   </div>
+                               )}
 
-                               <Button variant="primary" onClick={handleDonate} style={{ backgroundColor: '#D64C31', borderColor: '#D64C31' }}>
-                                   Donate
-                               </Button>
-                           </Form>
-                       </div>
-                   </div>
+            {/* Donor Input Form */}
+            <Form>
+                <Form.Group controlId="donorName">
+                    <Form.Label>Donor Name</Form.Label>
+                    <Form.Control 
+                        type="text" 
+                        placeholder="Enter your name" 
+                        value={donorName} 
+                        readOnly 
+                        style={{ backgroundColor: '#2B3036', color: '#F2F2F2', borderColor: '#C9A86A' }}
+                    />
+                </Form.Group>
 
-                   {/* Comment Section */}
-                   <div style={{ marginTop: '40px' }}>
-                       <h4 style={{ color: '#C9A86A' }}>Comments</h4>
-                       <Form onSubmit={handleCommentSubmit}>
-                           <Form.Group controlId="newComment">
-                               <Form.Control 
-                                   as="textarea" 
-                                   rows={3} 
-                                   placeholder="Add a comment..." 
-                                   value={newComment} 
-                                   disabled={!isCommentEnabled} 
-                                   onChange={(e) => setNewComment(e.target.value)} 
-                                   style={{ backgroundColor: '#2B3036', color: '#F2F2F2', borderColor: '#C9A86A' }} 
-                               />
-                           </Form.Group>
-                           <Button variant="secondary" type="submit" disabled={!isCommentEnabled} style={{ backgroundColor: '#D64C31', borderColor: '#D64C31' }}>
-                               Submit Comment
-                           </Button>
-                       </Form>
+                <Form.Group controlId="donationAmount">
+                    <Form.Label>Donation Amount ($)</Form.Label>
+                    <Form.Control 
+                        type="number" 
+                        placeholder="Enter amount" 
+                        value={donationAmount} 
+                        onChange={(e) => setDonationAmount(e.target.value)} 
+                        onWheel={(e) => e.preventDefault()} 
+                        min="0" 
+                        style={{ appearance: 'none', MozAppearance: 'textfield', backgroundColor: '#2B3036', color: '#F2F2F2', borderColor: '#C9A86A' }} 
+                    />
+                </Form.Group>
 
-                       {/* Display Comments */}
-                       <div style={{ marginTop: '20px' }}>
-                           {comments.length > 0 ? (
-                               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                   <thead>
-                                       <tr>
-                                           <th style={{ borderBottom: '2px solid #ccc', padding: '10px', textAlign: 'center', color: '#F2F2F2' }}>Name</th>
-                                           <th style={{ borderBottom: '2px solid #ccc', padding: '10px', textAlign: 'center', color: '#F2F2F2' }}>Comment</th>
-                                           <th style={{ borderBottom: '2px solid #ccc', padding: '10px', textAlign: 'center', color: '#F2F2F2' }}>Created On</th>
-                                       </tr>
-                                   </thead>
-                                   <tbody>
-                                       {comments.map((comment, index) => (
-                                           <tr key={index} style={{ borderBottom: '1px solid #ccc' }}>
-                                               <td style={{ padding: '10px', color: '#F2F2F2' }}>{comment.name}</td>
-                                               <td style={{ padding: '10px', color: '#F2F2F2' }}>{comment.comment}</td>
-                                               <td style={{ padding: '10px', color: '#F2F2F2' }}>{new Date(comment.createdOn).toLocaleString()}</td>
-                                           </tr>
-                                       ))}
-                                   </tbody>
-                               </table>
-                           ) : (
-                               <p>No comments yet.</p>
-                           )}
-                       </div>
-                   </div>
-               </Col>
+                <Button variant="primary" onClick={handleDonate} style={{ backgroundColor: '#D64C31', borderColor: '#D64C31' }}>
+                    Donate
+                </Button>
+            </Form>
+        </div>
+    </div>
+
+    {/* Comment Section */}
+    <div style={{ marginTop: '40px' }}>
+        <h4 style={{ color: '#C9A86A' }}>Comments</h4>
+        <Form onSubmit={handleCommentSubmit}>
+            <Form.Group controlId="newComment">
+                <Form.Control 
+                    as="textarea" 
+                    rows={3} 
+                    placeholder="Add a comment..." 
+                    value={newComment} 
+                    disabled={!isCommentEnabled} 
+                    onChange={(e) => setNewComment(e.target.value)} 
+                    style={{ backgroundColor: '#2B3036', color: '#F2F2F2', borderColor: '#C9A86A' }} 
+                />
+            </Form.Group>
+            <Button variant="secondary" type="submit" disabled={!isCommentEnabled} style={{ backgroundColor: '#D64C31', borderColor: '#D64C31' }}>
+                Submit Comment
+            </Button>
+        </Form>
+
+        {/* Display Comments */}
+        <div style={{ marginTop: '20px' }}>
+            {comments.length > 0 ? (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                        <tr>
+                            <th style={{ borderBottom: '2px solid #ccc', padding: '10px', textAlign: 'center', color: '#F2F2F2' }}>Name</th>
+                            <th style={{ borderBottom: '2px solid #ccc', padding: '10px', textAlign: 'center', color: '#F2F2F2' }}>Comment</th>
+                            <th style={{ borderBottom: '2px solid #ccc', padding: '10px', textAlign: 'center', color: '#F2F2F2' }}>Created On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {comments.map((comment, index) => (
+                            <tr key={index} style={{ borderBottom: '1px solid #ccc' }}>
+                                <td style={{ padding: '10px', color: '#F2F2F2' }}>{comment.name}</td>
+                                <td style={{ padding: '10px', color: '#F2F2F2' }}>{comment.comment}</td>
+                                <td style={{ padding: '10px', color: '#F2F2F2' }}>{new Date(comment.createdOn).toLocaleString()}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>No comments yet.</p>
+            )}
+        </div>
+    </div>
+</Col>
            </Row>
        </Container>
    );
