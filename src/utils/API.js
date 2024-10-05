@@ -70,6 +70,10 @@ export default {
 
   login: function(userData) {
     return axios.post(BASEURL_USER + '/login', userData)
+  },
+
+  getFilteredCampaigns: function(recipientType) {
+    return axios.get(`${BASEURL_CAMPAIGN}/filtered?recipientType=${recipientType}`);
   }
 
 };
