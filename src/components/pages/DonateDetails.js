@@ -3,6 +3,28 @@ import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import API from './../../utils/API'; // Adjust the import path as necessary
 import Loading from './../../utils/Loading';
 import { withRouter } from 'react-router-dom'; // Import withRouter to access route parameters
+import styled from 'styled-components';
+import { UserAddOutlined} from '@ant-design/icons';
+
+const Theme = {
+    fontPrimary: "'Poppins', sans-serif",
+    fontSecondary: "'Playfair Display', serif",
+    primary: '#C9A86A', // Muted gold
+    secondary: '#8A7968', // Warm taupe
+    accent: '#D64C31', // Deep coral
+    background: '#0F1419', // Rich dark blue-gray
+    surface: '#1E2328', // Slightly lighter blue-gray
+    text: '#F2F2F2', // Off-white
+    textDark: '#A0A0A0', // Medium gray
+};
+
+const IconWrapper = styled.div`
+   font-size: 2rem;
+  color: ${Theme.primary};
+  margin-right: 0.5rem; // Add space between icon and text
+  display: inline-flex; // Ensure the icon is inline with the text
+  align-items: center; // Center the icon vertically
+`;
 
 const DonateDetails = ({ match }) => {
     const id = match.params.id; // Get the campaign ID from URL parameters
@@ -129,19 +151,19 @@ const DonateDetails = ({ match }) => {
     }}>
         {/* Title and Description on the Left */}
         <div style={{ flex: 1 }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#C9A86A' }}>{campaign.title}</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#C9A86A', textAlign:'left' }}>{campaign.title}</h3>
             
             {/* Square Box for Image (Increased Size) */}
             <div style={{
-                width: '300px', // Increased width by 50%
-                height: '300px', // Increased height by 50%
+                width: '600px', // Increased width by 50%
+                height: '387px', // Increased height by 50%
                 overflow: 'hidden', // Hide overflow
                 borderRadius: '12px', // Optional: rounded corners for the box
                 marginBottom: '10px',
                 display: 'flex', // Use flexbox to center the image
                 justifyContent: 'center', // Center horizontally
                 alignItems: 'center', // Center vertically
-                marginLeft: '27%'
+                textAlign:'left'
             }}>
                 {campaign.image && (
                     <img 
@@ -156,31 +178,94 @@ const DonateDetails = ({ match }) => {
                     />
                 )}
             </div>
-
-            <p style={{ marginBottom: '10px' }}><strong>Description:</strong> {campaign.description}</p>
+            <br></br>
+            <p style={{ marginTop: '30px', textAlign: 'left', display: 'flex', alignItems: 'center', fontFamily: "'Poppins', sans-serif"}}>
+            <IconWrapper>
+                <UserAddOutlined />
+            </IconWrapper>
+            {campaign.createdUsername} Started this Fundraiser
+        </p>
+            <div style={{  textAlign:'left' }}>
+            <hr style={{
+                border: 'none', // Remove default border
+                height: '2px', // Set height of the line
+                backgroundColor: '#C9A86A', // Set color of the line
+                width: '100%', // Set width of the line
+                margin: '20px 0' // Add margin above and below the line
+            }} />
+            
         </div>
+            <p style={{ marginBottom: '10px', textAlign:'left', color:'whitesmoke' }}><strong style={{color:'#C9A86A' , fontFamily: "'Poppins', sans-serif"}}>Description:</strong> {campaign.description}</p>
+            <div style={{  textAlign:'left' }}>
+            <hr style={{
+                border: 'none', // Remove default border
+                height: '2px', // Set height of the line
+                backgroundColor: '#C9A86A', // Set color of the line
+                width: '100%', // Set width of the line
+                margin: '20px 0' // Add margin above and below the line
+            }} />
+            <p style={{ textAlign: 'left' }}><strong style={{color:'#C9A86A', fontFamily: "'Poppins', sans-serif"}}>Contact The Creator: </strong> {campaign.createdUserEmail}</p>
+        </div>
+        </div>
+        
 
-        {/* Donation Details Card on the Right */}
-        <div style={{
-            padding: '20px',
-            borderRadius: '12px',
-            backgroundColor: '#1E2328',
-            boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
-            width: '300px'
-        }}>
-            <p><strong>Amount Raised:</strong> ${campaign.amountRaised}</p>
-            <p><strong>Goal:</strong> ${campaign.goal}</p>
+      {/* Donation Details Card on the Right */}
+<div style={{
+    padding: '20px',
+    marginTop: '70px',
+    borderRadius: '12px',
+    backgroundColor: '#1E2328',
+    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)',
+    width: '300px',
+    marginLeft: '20px'
+}}>
+    {/* Progress Bar Section */}
+    <div style={{ marginTop: '20px' }}>
+        {/* Calculate the percentage of the goal achieved */}
+        {(() => {
+            const percent = (campaign.amountRaised / campaign.goal) * 100;
 
-            {topDonor && (
-                                   <div style={{ marginBottom: '15px', color: '#F2F2F2' }}>
-                                       <strong>Top Donor:</strong> {topDonor.donorName} - ${topDonor.amount}
-                                   </div>
-                               )}
+            return (
+                <>
+                    {/* Progress Bar */}
+                    <div style={{
+                        backgroundColor: 'black',
+                        borderRadius: '5px',
+                        overflow: 'hidden',
+                        height: '20px'
+                    }}>
+                        <div style={{
+                            width: `${percent}%`,
+                            backgroundColor: '#8A7968',
+                            height: '100%',
+                            transition: 'width 0.5s ease-in-out'
+                        }} />
+                    </div>
+                    {/* Amount raised and goal text */}
+                    <p style={{ color:'#C9A86A', fontFamily: "'Poppins', sans-serif", marginTop: '5px' }}>
+                        ${campaign.amountRaised} raised of ${campaign.goal} goal
+                    </p>
+                </>
+            );
+        })()}
+    </div>
+
+    <p style={{ textAlign: 'left' }}><strong style={{color:'#C9A86A'}}>Amount Raised:</strong> ${campaign.amountRaised}</p>
+    <p style={{ textAlign: 'left' }}><strong style={{color:'#C9A86A'}}>Goal:</strong> ${campaign.goal}</p>
+    
+    {topDonor && (
+        <div style={{ marginBottom: '15px', color: '#F2F2F2', textAlign: 'left' }}>
+            <strong style={{color:'#C9A86A'}}>Top Donor:</strong> {topDonor.donorName} - ${topDonor.amount}
+        </div>
+    )}
+
+ 
+
 
             {/* Donor Input Form */}
             <Form>
                 <Form.Group controlId="donorName">
-                    <Form.Label>Donor Name</Form.Label>
+                    <Form.Label style={{color:'#C9A86A', fontFamily: "'Poppins', sans-serif"}}>Donor Name</Form.Label>
                     <Form.Control 
                         type="text" 
                         placeholder="Enter your name" 
@@ -191,7 +276,7 @@ const DonateDetails = ({ match }) => {
                 </Form.Group>
 
                 <Form.Group controlId="donationAmount">
-                    <Form.Label>Donation Amount ($)</Form.Label>
+                    <Form.Label style={{color:'#C9A86A', fontFamily: "'Poppins', sans-serif"}}>Donation Amount ($)</Form.Label>
                     <Form.Control 
                         type="number" 
                         placeholder="Enter amount" 
@@ -212,7 +297,7 @@ const DonateDetails = ({ match }) => {
 
     {/* Comment Section */}
     <div style={{ marginTop: '40px' }}>
-        <h4 style={{ color: '#C9A86A' }}>Comments</h4>
+        <h4 style={{ color: '#C9A86A' , textAlign:'left' }}>Words of support</h4>
         <Form onSubmit={handleCommentSubmit}>
             <Form.Group controlId="newComment">
                 <Form.Control 

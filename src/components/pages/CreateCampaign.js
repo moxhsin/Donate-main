@@ -248,15 +248,18 @@ const CreateCampaign = () => {
                     </StyledFormGroup>
 
                     <StyledFormGroup>
-                        <StyledFormLabel>Recipient</StyledFormLabel>
-                        <StyledFormControl
-                            type="text"
-                            name="recipient"
-                            value={formData.recipient}
-                            onChange={handleInputChange}
-                            placeholder="Who is this campaign for?"
-                        />
-                    </StyledFormGroup>
+    <StyledFormLabel>Recipient</StyledFormLabel>
+    <StyledFormControl
+        as="select" // Change to a select dropdown
+        name="recipient"
+        value={formData.recipient}
+        onChange={handleInputChange}
+    >
+        <option value="">Select a recipient...</option> {/* Default empty option */}
+        <option value="Education">Education</option>
+        <option value="Medical">Medical</option>
+    </StyledFormControl>
+</StyledFormGroup>
 
                     <StyledFormGroup>
                         <StyledFormLabel>Goal Amount</StyledFormLabel>

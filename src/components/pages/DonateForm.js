@@ -54,7 +54,7 @@ const ProgressBar = styled.div`
 const Progress = styled.div`
   width: ${props => props.percent}%;
   height: 100%;
-  background-color: red; // Set to red color as requested
+  background-color: #8A7968; // Set to red color as requested
 `;
 
 const DonateForm = () => {
@@ -104,7 +104,7 @@ const DonateForm = () => {
                                     All Active Campaigns
                                 </h1>
                                     <div className="d-flex flex-wrap justify-content-center">
-                                        {donateForm.map(({ _id, title, image, goal, remainingAmount }) => {
+                                        {donateForm.map(({ _id, title, image, goal, remainingAmount, amountRaised }) => {
                                             // Calculate total amount and percentage outside of the return statement
                                             const totalAmount = goal - remainingAmount;
                                             const percent = Math.max(0, Math.min(100, (totalAmount / goal) * 100));
@@ -126,6 +126,7 @@ const DonateForm = () => {
                                                             <ProgressBar>
                                                                 <Progress percent={percent} />
                                                             </ProgressBar>
+                                                            <p>${amountRaised} raised of ${goal} goal</p>
                                                         </div>
                                                     </CampaignCard>
                                                 </div>

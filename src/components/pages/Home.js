@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from 'styled-components';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { UserAddOutlined, DollarCircleOutlined, BarChartOutlined, HeartOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import video from "../videos/alternate_video2.mp4";
+import API from "../../utils/API";
 
 // Import images
 import Kids from '../images/kids.png';
@@ -25,6 +26,24 @@ const Theme = {
     textDark: '#A0A0A0', // Medium gray
 };
 
+const CircularButton = styled.button`
+    background-color: ${Theme.primary}; // Use primary color from theme
+    color: ${Theme.text}; // Use text color from theme
+    border: none;
+    border-radius: 50%; // Makes the button circular
+    width: 50px; // Set width for the button
+    height: 50px; // Set height for the button
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px; // Adjust font size for the arrow
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: ${Theme.accent}; // Change background on hover to accent color
+    }
+`;
 const StyledWrapper = styled.div`
   font-family: ${Theme.fontPrimary};
   background-color: ${Theme.background};
@@ -182,12 +201,37 @@ const H3 = styled.h3`
   color: #E0C9A6; // Soft gold color
 `;
 const Home = () => {
+    const [campaigns, setCampaigns] = useState([]);
+    const [recipientType, setRecipientType] = useState('Education'); // Default selection
+
     const heroRef = useRef(null);
     const headingRef = useRef(null);
     const paragraphRef = useRef(null);
     const buttonRef = useRef(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 3;
+
+    const totalPages = Math.ceil(campaigns.length / itemsPerPage);
+
+    // Get the current campaigns to display based on the current page
+    const displayedCampaigns = campaigns.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
     const userData = JSON.parse(sessionStorage.getItem('userData'));
+
+    // Fetch campaigns based on selected recipient type
+    const fetchCampaigns = async (type) => {
+        try {
+            const response = await API.getFilteredCampaigns(type);
+            setCampaigns(response.data);
+        } catch (error) {
+            console.error('Error fetching campaigns:', error);
+        }
+    };
+
+    // Effect to fetch campaigns when component mounts or recipientType changes
+    useEffect(() => {
+        fetchCampaigns(recipientType);
+    }, [recipientType]);
 
     useEffect(() => {
         const tl = gsap.timeline();
@@ -316,46 +360,62 @@ const Home = () => {
                 </ContentWrapper>
             </Section>
 
+            {/* Featured Campaigns Section with Dropdown */}
             <Section>
-                <ContentWrapper>
-                    <Heading className="fade-in">Featured Campaigns</Heading>
-                    <Grid>
-                        <CampaignCard className="grid-item">
-                            <CampaignImage src={Kids} alt="Clean Water for All" className="parallax-image" />
-                            <CampaignContent>
-                                <CampaignTitle>Clean Water for All</CampaignTitle>
-                                <ProgressBar className="progress-bar" data-progress="75">
-                                    <Progress />
-                                </ProgressBar>
-                                <Paragraph>$15,000 raised of $20,000 goal</Paragraph>
-                                <StyledButton to="/donate">Donate Now</StyledButton>
-                            </CampaignContent>
-                        </CampaignCard>
-                        <CampaignCard className="grid-item">
-                            <CampaignImage src={Girl} alt="Education for Children" className="parallax-image" />
-                            <CampaignContent>
-                                <CampaignTitle>Education for Children</CampaignTitle>
-                                <ProgressBar className="progress-bar" data-progress="50">
-                                    <Progress />
-                                </ProgressBar>
-                                <Paragraph>$10,000 raised of $20,000 goal</Paragraph>
-                                <StyledButton to="/donate">Donate Now</StyledButton>
-                            </CampaignContent>
-                        </CampaignCard>
-                        <CampaignCard className="grid-item">
-                            <CampaignImage src={Kids2} alt="Reforestation Project" className="parallax-image" />
-                            <CampaignContent>
-                                <CampaignTitle>Reforestation Project</CampaignTitle>
-                                <ProgressBar className="progress-bar" data-progress="25">
-                                    <Progress />
-                                </ProgressBar>
-                                <Paragraph>$5,000 raised of $20,000 goal</Paragraph>
-                                <StyledButton to="/donate">Donate Now</StyledButton>
-                            </CampaignContent>
-                        </CampaignCard>
-                    </Grid>
-                </ContentWrapper>
-            </Section>
+    <ContentWrapper>
+        <Heading className="fade-in">Featured Campaigns</Heading>
+        <div className="fade-in">
+        {/* Dropdown for selecting recipient type */}
+        <select value={recipientType} onChange={(e) => setRecipientType(e.target.value)} style={{ marginBottom: '20px', padding: '10px', fontSize: '16px', backgroundColor: '#D64C31', color:'#F2F2F2', display: 'flex', borderRadius:'21px', fontFamily: "'Playfair Display', serif" }}>
+            <option value="Education">Education</option>
+            <option value="Medical">Medical</option>
+        </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Previous Button */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                {currentPage > 0 && (
+                    <CircularButton onClick={() => setCurrentPage(currentPage - 1)} style={{ marginRight: '10px' }}>
+                        &lt; {/* Previous arrow */}
+                    </CircularButton>
+                )}
+
+                {/* Campaign Cards Grid */}
+                <Grid style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto', flexGrow: 1 }}>
+                    {displayedCampaigns.length > 0 ? (
+                        displayedCampaigns.map((campaign) => {
+                            const { _id, image, title, goal, amountRaised } = campaign;
+                            const percent = (amountRaised / goal) * 100;
+
+                            return (
+                                <CampaignCard key={_id} className="grid-item" style={{ minWidth: '300px', marginRight: '10px' }}>
+                                    {image && <CampaignImage src={image} alt={title} className="parallax-image" />}
+                                    <CampaignContent>
+                                        <CampaignTitle>{title}</CampaignTitle>
+                                        <ProgressBar className="progress-bar" data-progress={percent}>
+                                            <Progress percent={percent} />
+                                        </ProgressBar>
+                                        <Paragraph>${amountRaised} raised of ${goal} goal</Paragraph>
+                                        <StyledButton to={`/donate-details/${_id}`}>Donate Now</StyledButton>
+                                    </CampaignContent>
+                                </CampaignCard>
+                            );
+                        })
+                    ) : (
+                        <Paragraph>No campaigns available for this category.</Paragraph>
+                    )}
+                </Grid>
+
+                {currentPage < totalPages - 1 && (
+                    <CircularButton onClick={() => setCurrentPage(currentPage + 1)} style={{ marginLeft: '10px' }}>
+                        &gt; {/* Next arrow */}
+                    </CircularButton>
+                )}
+            </div>
+        </div>
+    </ContentWrapper>
+</Section>
 
             <Section>
                 <ContentWrapper>
