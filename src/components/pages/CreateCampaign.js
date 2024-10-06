@@ -4,18 +4,8 @@ import { Link, Redirect } from "react-router-dom";
 import styled from 'styled-components';
 import API from "../../utils/API";
 import ImageUpload from '../../utils/ImageUpload';
+import { Theme } from './Theme';
 
-const Theme = {
-    fontPrimary: "'Poppins', sans-serif",
-    fontSecondary: "'Playfair Display', serif",
-    primary: '#C9A86A',
-    secondary: '#8A7968',
-    accent: '#D64C31',
-    background: '#0F1419',
-    surface: '#1E2328',
-    text: '#F2F2F2',
-    textDark: '#A0A0A0',
-};
 
 const PageContainer = styled.div`
   background-color: ${Theme.background};
@@ -282,7 +272,7 @@ const CreateCampaign = () => {
                             </div>
                         )}
                     </StyledFormGroup>
-                    
+
                 </FormSection>
 
                 <FormSection>

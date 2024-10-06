@@ -1,18 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { Theme } from './Theme';
 
-const Theme = {
-  fontPrimary: "'Poppins', sans-serif",
-  fontSecondary: "'Playfair Display', serif",
-  primary: '#C9A86A',
-  secondary: '#8A7968',
-  accent: '#D64C31',
-  background: '#0F1419',
-  surface: '#1E2328',
-  text: '#F2F2F2',
-  textDark: '#A0A0A0',
-};
+
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap');

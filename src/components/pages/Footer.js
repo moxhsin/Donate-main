@@ -3,18 +3,8 @@ import { Link } from "react-router-dom";
 import { FacebookOutlined, TwitterOutlined, InstagramOutlined, LinkedinOutlined } from '@ant-design/icons';
 import Icon from '../images/original_trans.png';
 import styled from 'styled-components';
+import { Theme } from "./Theme";
 
-const Theme = {
-  fontPrimary: "'Poppins', sans-serif",
-  fontSecondary: "'Playfair Display', serif",
-  primary: '#C9A86A', // Muted gold
-  secondary: '#8A7968', // Warm taupe
-  accent: '#D64C31', // Deep coral
-  background: '#0F1419', // Rich dark blue-gray
-  surface: '#1E2328', // Slightly lighter blue-gray
-  text: '#F2F2F2', // Off-white
-  textDark: '#A0A0A0', // Medium gray
-};
 
 const FooterContainer = styled.footer`
   background-color: ${Theme.background};

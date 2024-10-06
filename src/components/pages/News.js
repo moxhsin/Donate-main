@@ -5,6 +5,7 @@ import './test.css';
 import { Carousel } from 'antd';
 import './style.css'
 import styled, { createGlobalStyle } from "styled-components";
+import { Theme } from "./Theme";
 
 function SearchNews() {
     const [result, setResults] = useState([]);
@@ -35,17 +36,7 @@ function SearchNews() {
     function imgLink(newsLink) {
         window.open(newsLink, "_blank")
     }
-    const Theme = {
-        fontPrimary: "'Poppins', sans-serif",
-        fontSecondary: "'Playfair Display', serif",
-        primary: '#C9A86A',
-        secondary: '#8A7968',
-        accent: '#D64C31',
-        background: '#0F1419',
-        surface: '#1E2328',
-        text: '#F2F2F2',
-        textDark: '#A0A0A0',
-    };
+
 
     const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap');

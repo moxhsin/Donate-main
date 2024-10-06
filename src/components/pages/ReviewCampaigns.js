@@ -3,18 +3,7 @@ import { Container, Row, Col, Table, Button } from 'react-bootstrap';
 import API from './../../utils/API'; // Assuming API is imported from a file
 import DeleteBtn from '../DeleteBtn'; // Assuming DeleteBtn is a custom component
 import formatDate from './../../utils/DateFormatter'; // Assuming formatDate is a utility function
-
-const Theme = {
-    fontPrimary: "'Poppins', sans-serif",
-    fontSecondary: "'Playfair Display', serif",
-    primary: '#C9A86A',
-    secondary: '#8A7968',
-    accent: '#D64C31',
-    background: '#0F1419',
-    surface: '#1E2328',
-    text: '#F2F2F2',
-    textDark: '#A0A0A0',
-};
+import { Theme } from './Theme';
 
 class ReviewCampaigns extends Component {
     state = {
@@ -57,11 +46,11 @@ class ReviewCampaigns extends Component {
                             All Pending Campaigns
                         </h1>
                         {donateForm.length ? (
-                            <Table 
-                                striped 
-                                bordered  
-                                style={{ 
-                                    backgroundColor: Theme.surface, 
+                            <Table
+                                striped
+                                bordered
+                                style={{
+                                    backgroundColor: Theme.surface,
                                     color: Theme.text,
                                     borderRadius: '10px',
                                     overflow: 'hidden'
@@ -79,8 +68,8 @@ class ReviewCampaigns extends Component {
                                 </thead>
                                 <tbody>
                                     {donateForm.map(({ _id, title, description, goal, createdUsername, createdOn }) => (
-                                        <tr 
-                                            key={_id} 
+                                        <tr
+                                            key={_id}
                                             style={{
                                                 transition: 'transform 0.3s ease',
                                             }}
@@ -98,8 +87,8 @@ class ReviewCampaigns extends Component {
                                             <td>{formatDate(createdOn)}</td>
                                             <td>
                                                 {/* Approve Button */}
-                                                <Button 
-                                                    variant="outline-dark" 
+                                                <Button
+                                                    variant="outline-dark"
                                                     onClick={() => this.handleAction(_id, 'approve')}
                                                     style={{
                                                         borderColor: Theme.primary,
@@ -117,11 +106,11 @@ class ReviewCampaigns extends Component {
                                                 >
                                                     Approve
                                                 </Button>
-        
+
                                                 {/* Delete Button */}
-                                                <DeleteBtn 
-                                                    onClick={() => this.handleAction(_id, 'reject')} 
-                                                    style={{ marginLeft: '10px' }} 
+                                                <DeleteBtn
+                                                    onClick={() => this.handleAction(_id, 'reject')}
+                                                    style={{ marginLeft: '10px' }}
                                                 />
                                             </td>
                                         </tr>
