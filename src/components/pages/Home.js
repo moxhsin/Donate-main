@@ -11,20 +11,11 @@ import API from "../../utils/API";
 import Kids from '../images/kids.png';
 import Girl from '../images/girl.png';
 import Kids2 from '../images/container.png';
+import { Theme } from "./Theme";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Theme = {
-    fontPrimary: "'Poppins', sans-serif",
-    fontSecondary: "'Playfair Display', serif",
-    primary: '#C9A86A', // Muted gold
-    secondary: '#8A7968', // Warm taupe
-    accent: '#D64C31', // Deep coral
-    background: '#0F1419', // Rich dark blue-gray
-    surface: '#1E2328', // Slightly lighter blue-gray
-    text: '#F2F2F2', // Off-white
-    textDark: '#A0A0A0', // Medium gray
-};
+
 
 const CircularButton = styled.button`
     background-color: ${Theme.primary}; // Use primary color from theme

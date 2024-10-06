@@ -14,6 +14,7 @@ const Loading = ({ isLoading }) => {
     zIndex: 999, // Ensure it appears above other content
     opacity: isLoading ? 1 : 0,
     transition: 'opacity 0.3s ease',
+    pointerEvents: isLoading ? 'auto' : 'none', // Prevent interactions when loading
   };
 
   return (

@@ -2,18 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { NavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
+import { Theme } from "../pages/Theme";
 
-const Theme = {
-  fontPrimary: "'Poppins', sans-serif",
-  fontSecondary: "'Playfair Display', serif",
-  primary: '#C9A86A', // Muted gold
-  secondary: '#8A7968', // Warm taupe
-  accent: '#D64C31', // Deep coral
-  background: '#0F1419', // Rich dark blue-gray
-  surface: '#1E2328', // Slightly lighter blue-gray
-  text: '#F2F2F2', // Off-white
-  textDark: '#A0A0A0', // Medium gray
-};
 
 const NavbarContainer = styled.nav`
   background-color: ${Theme.surface};
@@ -85,28 +75,28 @@ const commonFontStyles = `
 const StyledNavDropdown = styled(NavDropdown)`
    .dropdown-toggle {
      ${commonFontStyles}
-     padding: 10px; 
-     transition: .3s; 
+     padding: 10px;
+     transition: .3s;
 
      &:hover {
-       color: ${Theme.primary} !important; 
+       color: ${Theme.primary} !important;
      }
    }
 
    .dropdown-menu {
-     background-color: ${Theme.surface}; 
-     border: none; 
-     border-radius: .25rem; 
-     padding: .5rem; 
+     background-color: ${Theme.surface};
+     border: none;
+     border-radius: .25rem;
+     padding: .5rem;
    }
 
    .dropdown-item {
      ${commonFontStyles}
-     transition: .3s; 
+     transition: .3s;
 
      &:hover {
-       background-color: ${Theme.primary}; 
-       color: ${Theme.background}; 
+       background-color: ${Theme.primary};
+       color: ${Theme.background};
      }
    }
 `;
@@ -123,15 +113,15 @@ const NavLink = styled(Link)`
 `;
 
 const ContactButton = styled(Link)`
-   background-color:${Theme.primary}; 
-   color:${Theme.background}; 
-   padding:.5rem; 
-   border-radius:.25rem; 
-   text-decoration:none; 
+   background-color:${Theme.primary};
+   color:${Theme.background};
+   padding:.5rem;
+   border-radius:.25rem;
+   text-decoration:none;
 
    &:hover {
-       background-color:${Theme.accent}; 
-       color:${Theme.text}; 
+       background-color:${Theme.accent};
+       color:${Theme.text};
    }
 `;
 
@@ -159,11 +149,11 @@ const Navbar = ({ history })  => {
    // Retrieve user data from local storage
    const userData = JSON.parse(sessionStorage.getItem('userData'));
    const isAdmin = userData ? userData.isAdmin : false;
-  
+
    const handleLogout = () => {
       // Remove userData from sessionStorage
       sessionStorage.removeItem('userData');
-      
+
       // Redirect to home page
       history.push('/');
     };

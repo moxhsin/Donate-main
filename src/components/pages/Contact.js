@@ -1,17 +1,6 @@
 import React from 'react';
+import { Theme } from './Theme';
 
-// Define the theme object
-const Theme = {
-    fontPrimary: "'Poppins', sans-serif",
-    fontSecondary: "'Playfair Display', serif",
-    primary: '#C9A86A', // Muted gold
-    secondary: '#8A7968', // Warm taupe
-    accent: '#D64C31', // Deep coral
-    background: '#0F1419', // Rich dark blue-gray
-    surface: '#1E2328', // Slightly lighter blue-gray
-    text: '#F2F2F2', // Off-white
-    textDark: '#A0A0A0', // Medium gray
-};
 
 // Create a functional component
 const Contact = () => {
