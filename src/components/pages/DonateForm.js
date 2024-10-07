@@ -3,19 +3,22 @@ import { Container, Row, Col, Button, Modal } from 'react-bootstrap';
 import API from './../../utils/API'; // Adjust the import path as necessary
 import Loading from './../../utils/Loading';
 import styled from 'styled-components';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
+// import { Theme } from './Theme';
 
-const Theme = {
-    fontPrimary: "'Poppins', sans-serif",
+export const Theme = {
+    fontPrimary: "'Open Sans', sans-serif", // A clean, modern sans-serif font commonly used in fundraising platforms
+    fontSecondary: "'Lato', sans-serif", // Another modern sans-serif font for variet
     fontSecondary: "'Playfair Display', serif",
-    primary: '#C9A86A',
-    secondary: '#8A7968',
-    accent: '#D64C31',
-    background: '#0F1419',
-    surface: '#1E2328',
-    text: '#F2F2F2',
-    textDark: '#A0A0A0',
+    primary: '#C9A86A', // Muted gold
+    secondary: '#8A7968', // Warm taupe
+    accent: '#D64C31', // Deep coral
+    background: '#0F1419', // Rich dark blue-gray
+    surface: '#1E2328', // Slightly lighter blue-gray
+    text: '#F2F2F2', // Off-white
+    textDark: '#A0A0A0', // Medium gray
 };
+
 
 const CampaignCard = styled.div`
   cursor: pointer;
@@ -24,7 +27,7 @@ const CampaignCard = styled.div`
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  
+
   /* Set fixed width and height */
   width: 300px; /* Set your desired width */
   height: 400px; /* Set your desired height */
@@ -66,15 +69,7 @@ const DonateForm = () => {
         loadCampaigns();
     }, []); // Empty dependency array means this runs once on mount
 
-    const [redirectId, setRedirectId] = useState(null);
 
-    const handleCardClick = (id) => {
-        setRedirectId(id);
-    };
-
-    if (redirectId) {
-        return <Redirect to={`/donate-details/${redirectId}`} />;
-    }
 
     const loadCampaigns = async () => {
         setIsLoading(true);
@@ -110,7 +105,8 @@ const DonateForm = () => {
                                             const percent = Math.max(0, Math.min(100, (totalAmount / goal) * 100));
 
                                             return (
-                                                <div key={_id} style={{ margin: '10px' }} onClick={() => handleCardClick(_id)}>
+                                                <a target='_blank' key={_id} href={`/donate-details/${_id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
                                                     <CampaignCard>
                                                         {image && <img src={image} alt={title} />}
                                                         <div style={{ padding: '20px', cursor: 'pointer' }}>
@@ -129,7 +125,8 @@ const DonateForm = () => {
                                                             <p>${amountRaised} raised of ${goal} goal</p>
                                                         </div>
                                                     </CampaignCard>
-                                                </div>
+
+                                                </a>
                                             );
                                         })}
                                     </div>
