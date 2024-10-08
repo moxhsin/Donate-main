@@ -246,12 +246,12 @@ const Donation = (props) => {
     }, [isAnonymous]);
 
     const handleCustomTipAmount = (e) => {
-        setCustomTipAmount(e.target.value)
+        setCustomTipAmount(donationAmount <= 0 ? 0 : e.target.value)
         setTip(e.target.value)
     }
 
     const handleTipPercentage = (e) => {
-      setTipPercentage(e.target.value)  
+      setTipPercentage(donationAmount <= 0 ? 0 : e.target.value)  
       setTip(((donationAmount * e.target.value) / 100).toFixed(2))
     } 
 
