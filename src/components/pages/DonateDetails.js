@@ -4,7 +4,7 @@ import API from './../../utils/API';
 import Loading from './../../utils/Loading';
 import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
-import { DollarOutlined, ShareAltOutlined, UserAddOutlined, LineChartOutlined, UserOutlined } from '@ant-design/icons';
+import { DollarOutlined, ShareAltOutlined, UserAddOutlined, LineChartOutlined, UserOutlined, StarOutlined } from '@ant-design/icons';
 // import { Theme } from './Theme';
 import { Audio, RotatingLines } from 'react-loader-spinner';
 import { Progress } from 'antd';
@@ -549,7 +549,7 @@ const handleCloseTop = () => setShowModalTop(false);
                 See All
             </Button>
             <Button variant="secondary" onClick={handleShowTop} style={{ marginTop: '10px', marginLeft: '10px', backgroundColor: Theme.secondary, borderColor: Theme.secondary }}>
-                See Top
+            <StarOutlined />  See Top
             </Button>
         </>
     )}
