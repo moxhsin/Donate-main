@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, ListGroup, Modal  } from 'react-bootstrap';
 import API from './../../utils/API';
 import Loading from './../../utils/Loading';
 import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
-import { DollarOutlined, ShareAltOutlined, UserAddOutlined } from '@ant-design/icons';
+import { DollarOutlined, ShareAltOutlined, UserAddOutlined, LineChartOutlined, UserOutlined } from '@ant-design/icons';
 // import { Theme } from './Theme';
 import { Audio, RotatingLines } from 'react-loader-spinner';
 import { Progress } from 'antd';
+import { Link } from 'react-router-dom';
+import { color } from 'three/webgpu';
+
+
 
 export const Theme = {
     fontPrimary: "'Open Sans', sans-serif", // A clean, modern sans-serif font commonly used in fundraising platforms
@@ -175,7 +179,7 @@ const DonationCard = styled.div`
   padding: 20px;
   margin-top: 70px;
   border-radius: 12px;
-  background-color: ${Theme.surface};
+  background-color: rgb(34 39 45);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   width: 300px;
   margin-left: 20px;
@@ -246,6 +250,22 @@ const DonateDetails = ({ match }) => {
     const [newComment, setNewComment] = useState('');
     const [topDonor, setTopDonor] = useState(null);
     const [isCommentEnabled, setIsCommentEnabled] = useState(false);
+    const [showModalAll, setShowModalAll] = useState(false);
+const [showModalTop, setShowModalTop] = useState(false);
+const [viewAll, setViewAll] = useState('newest'); // State for All Donations view
+const [viewTop, setViewTop] = useState('top'); // State for Top Donors view
+
+const handleShowAll = () => {
+    setViewAll('newest'); // Reset to newest when opening modal
+    setShowModalAll(true);
+};
+const handleCloseAll = () => setShowModalAll(false);
+
+const handleShowTop = () => {
+    setViewTop('top'); // Reset to top when opening modal
+    setShowModalTop(true);
+};
+const handleCloseTop = () => setShowModalTop(false);
 
     useEffect(() => {
         loadCampaignDetails();
@@ -295,22 +315,22 @@ const DonateDetails = ({ match }) => {
         }
     };
 
-    const handleDonate = async () => {
-        if (!donationAmount || donationAmount <= 0) {
-            alert("Please enter a valid donation amount greater than zero.");
-            return;
-        }
+    // const handleDonate = async () => {
+    //     if (!donationAmount || donationAmount <= 0) {
+    //         alert("Please enter a valid donation amount greater than zero.");
+    //         return;
+    //     }
 
-        try {
-            await API.donateToCampaign(id, { donorName, amount: donationAmount });
-            alert("Thank you for your donation!");
-            await loadCampaignDetails();
-            setDonationAmount('');
-        } catch (error) {
-            console.error("Error donating:", error);
-            alert("There was an error processing your donation. Please try again.");
-        }
-    };
+    //     try {
+    //         await API.donateToCampaign(id, { donorName, amount: donationAmount });
+    //         alert("Thank you for your donation!");
+    //         await loadCampaignDetails();
+    //         setDonationAmount('');
+    //     } catch (error) {
+    //         console.error("Error donating:", error);
+    //         alert("There was an error processing your donation. Please try again.");
+    //     }
+    // };
     const [showStickyBar, setShowStickyBar] = useState(true);
     const donateCardRef = useRef(null);
 
@@ -484,37 +504,155 @@ const DonateDetails = ({ match }) => {
                                 )}
 
                                 <StyledForm>
-                                    <Form.Group controlId="donorName">
-                                        <Form.Label style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>Donor Name</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="Enter your name"
-                                            value={donorName}
-                                            readOnly
-                                        />
-                                    </Form.Group>
-
-                                    <Form.Group controlId="donationAmount">
-                                        <Form.Label style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>Donation Amount ($)</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="Enter amount"
-                                            value={donationAmount}
-                                            onChange={(e) => setDonationAmount(e.target.value)}
-                                            onWheel={(e) => e.preventDefault()}
-                                            min="0"
-                                            style={{ appearance: 'none', MozAppearance: 'textfield' }}
-                                        />
-                                    </Form.Group>
-
-                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                        <ActionButton primary onClick={handleDonate}>
-                                            <DollarOutlined /> Donate
-                                        </ActionButton>
+                                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                <Link
+            to={`/donation?id=${id}`}
+            style={{
+                backgroundColor: Theme.accent,
+                color: Theme.text,
+                padding: '10px 20px',
+                textDecoration: 'none',
+                borderRadius: '4px',
+                fontFamily: Theme.fontPrimary,
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
+            Donate
+        </Link>
                                         <ActionButton onClick={handleShare}>
                                             <ShareAltOutlined /> Share
                                         </ActionButton>
                                     </div>
+
+                                    <div style={{ fontFamily: Theme.fontPrimary, backgroundColor: Theme.surface, marginTop: '13px', borderRadius: '14px', color: Theme.text, padding: '20px' }}>
+    {/* <h3 style={{ color: Theme.primary }}>Top Donations</h3> */}
+    
+    {/* Total Donations Display */}
+    <div style={{ marginBottom: '10px', fontSize: '16px', fontWeight: 'bold' }}>
+    <p style={{font:Theme.fontPrimary, color: Theme.primary, textAlign:'left'}}><LineChartOutlined style={{ marginRight: '8px', color: Theme.accent }} /> {campaign.donations.length} people just donated </p>
+    </div>
+
+    <ListGroup>
+        {campaign.donations.slice(0, 3).map((donation, index) => (
+            <ListGroup.Item key={index} style={{ backgroundColor: 'rgb(34 39 45)', color: Theme.primary, textAlign: 'left' }}>
+                <UserOutlined style={{ marginRight: '8px', color: Theme.accent }} />
+                {donation.donorName}: <span style={{ color: Theme.accent }}>${donation.amount}</span>
+            </ListGroup.Item>
+        ))}
+    </ListGroup>
+
+    {campaign.donations.length > 3 && (
+        <>
+            <Button variant="primary" onClick={handleShowAll} style={{ marginTop: '10px', backgroundColor: Theme.primary, borderColor: Theme.primary }}>
+                See All
+            </Button>
+            <Button variant="secondary" onClick={handleShowTop} style={{ marginTop: '10px', marginLeft: '10px', backgroundColor: Theme.secondary, borderColor: Theme.secondary }}>
+                See Top
+            </Button>
+        </>
+    )}
+
+    {/* Modal for displaying all donations */}
+    <Modal show={showModalAll} onHide={handleCloseAll} dialogClassName="modal-90w">
+        <Modal.Header closeButton style={{ backgroundColor: Theme.surface }}>
+            <Modal.Title style={{ color: Theme.primary }}>Donations: {campaign.donations.length}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: Theme.surface }}>
+            <div style={{ marginBottom: '10px' }}>
+                <Button style={{backgroundColor:Theme.primary , color: 'white'}} variant="outline-primary" onClick={() => setViewAll('newest')} active={viewAll === 'newest'}>
+                    Newest
+                </Button>
+                <Button variant="outline-primary" onClick={() => setViewAll('top')} active={viewAll === 'top'} style={{ marginLeft: '10px' , backgroundColor: Theme.secondary , color: 'white' }}>
+                    Top
+                </Button>
+            </div>
+            <ListGroup>
+                {(viewAll === 'newest' ? campaign.donations : campaign.donations.slice().sort((a, b) => b.amount - a.amount)).map((donation, index) => (
+                    <ListGroup.Item key={index} style={{ backgroundColor: Theme.surface, color: Theme.primary }}>
+                        <UserOutlined style={{ marginRight: '8px', color: Theme.accent }} />
+                        {donation.donorName}: <span style={{ color: Theme.accent }}>${donation.amount}</span>
+                    </ListGroup.Item>
+                ))}
+            </ListGroup>
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: Theme.surface }}>
+            {/* <Button variant="secondary" onClick={handleCloseAll} style={{ backgroundColor: Theme.secondary, borderColor: Theme.secondary }}>
+                Close
+            </Button> */}
+            <Link
+    to={`/donation?id=${id}`}
+    style={{
+        backgroundColor: Theme.accent,
+        color: Theme.text,
+        padding: '10px 20px',
+        textDecoration: 'none',
+        borderRadius: '4px',
+        fontFamily: Theme.fontPrimary,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center', // Center the text and icon
+        width: '100%', // Set width to 100%
+    }}
+>
+    <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
+    Donate
+</Link>
+        </Modal.Footer>
+    </Modal>
+
+    {/* Modal for displaying top donations */}
+    <Modal show={showModalTop} onHide={handleCloseTop} dialogClassName="modal-90w">
+    <Modal.Header closeButton style={{ backgroundColor: Theme.surface }}>
+            <Modal.Title style={{ color: Theme.primary }}>Donations: {campaign.donations.length}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: Theme.surface }}>
+            <div style={{ marginBottom: '10px' }}>
+                <Button style={{backgroundColor:Theme.primary , color: 'white'}} ariant="outline-primary" onClick={() => setViewTop('newest')} active={viewTop === 'newest'}>
+                    Newest
+                </Button>
+                <Button variant="outline-primary" onClick={() => setViewTop('top')} active={viewTop === 'top'} style={{ marginLeft: '10px', backgroundColor: Theme.secondary , color: 'white' }}>
+                    Top
+                </Button>
+            </div>
+            <ListGroup>
+                {(viewTop === 'newest' ? campaign.donations.slice().sort((a, b) => new Date(b.date) - new Date(a.date)) : campaign.donations.slice().sort((a, b) => b.amount - a.amount)).map((donation, index) => (
+                    <ListGroup.Item key={index} style={{ backgroundColor: Theme.surface, color: Theme.primary }}>
+                        <UserOutlined style={{ marginRight: '8px', color: Theme.accent }} />
+                        {donation.donorName}: <span style={{ color: Theme.accent }}>${donation.amount}</span>
+                    </ListGroup.Item>
+                ))}
+            </ListGroup>
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: Theme.surface }}>
+            {/* <Button variant="secondary" onClick={handleCloseTop} style={{ backgroundColor: Theme.secondary, borderColor: Theme.secondary }}>
+                Close
+            </Button> */}
+            <Link
+    to={`/donation?id=${id}`}
+    style={{
+        backgroundColor: Theme.accent,
+        color: Theme.text,
+        padding: '10px 20px',
+        textDecoration: 'none',
+        borderRadius: '4px',
+        fontFamily: Theme.fontPrimary,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center', // Center the text and icon
+        width: '100%', // Set width to 100%
+    }}
+>
+    <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
+    Donate
+</Link>
+        </Modal.Footer>
+    </Modal>
+
+</div>
+
+                                    
 
 
                                 </StyledForm>
@@ -567,13 +705,29 @@ const DonateDetails = ({ match }) => {
                     </ResponsiveCol>
                 </ResponsiveRow></PageContainer>
             <StickyBottomBar show={showStickyBar}>
-                <ActionButton primary onClick={() => donateCardRef.current.scrollIntoView({ behavior: 'smooth' })}>
-                    <DollarOutlined /> Donate
-                </ActionButton>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <Link
+            to={`/donation?id=${id}`}
+            style={{
+                backgroundColor: Theme.accent,
+                color: Theme.text,
+                padding: '10px 20px',
+                textDecoration: 'none',
+                borderRadius: '4px',
+                fontFamily: Theme.fontPrimary,
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
+            Donate
+        </Link>
                 <ActionButton onClick={handleShare}>
                     <ShareAltOutlined /> Share
                 </ActionButton>
+                </div>
             </StickyBottomBar>
+            
         </ResponsiveContainer>
 
     );
