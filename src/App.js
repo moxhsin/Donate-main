@@ -12,6 +12,7 @@ import Charity from './components/pages/Charity';
 import Search from './components/pages/Search';
 import Saved from './components/pages/Saved';
 import DonateForm from './components/pages/DonateForm';
+import Donation from './components/pages/Donation';
 import CreateCampaign from './components/pages/CreateCampaign';
 import ReviewCampaigns from './components/pages/ReviewCampaigns';
 import SignUp from './components/pages/SignUp';
@@ -35,6 +36,7 @@ class App extends Component {
                 <Route path="/create-campaign" exact={true} component={CreateCampaign} />
                 <Route path="/donate" exact={true} component={DonateForm} />
                 <Route path="/donate-details/:id" exact={true} component={DonateDetails} />
+                <Route path="/donation" exact={true} component={Donation} />
                 <Route path="/reviewCampaigns" exact={true} component={ReviewCampaigns} />
                 <Route path="/News" exact={true} component={SearchNews} />
                 <Route path="/Charity" exact={true} component={Charity} />
