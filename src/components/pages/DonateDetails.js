@@ -706,24 +706,22 @@ const handleCloseTop = () => setShowModalTop(false);
                 </ResponsiveRow></PageContainer>
             <StickyBottomBar show={showStickyBar}>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <button
-    onClick={() => window.location.href = `/donation?id=${id}`}
-    style={{
-        backgroundColor: Theme.accent,
-        color: Theme.text,
-        padding: '10px 20px',
-        textDecoration: 'none',
-        borderRadius: '4px',
-        fontFamily: Theme.fontPrimary,
-        display: 'flex',
-        alignItems: 'center',
-        border: 'none', // Optional: Remove default button border
-        cursor: 'pointer' // Change cursor to pointer on hover
-    }}
->
-    <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
-    Donate
-</button>
+            <Link
+            to={`/donation?id=${id}`}
+            style={{
+                backgroundColor: Theme.accent,
+                color: Theme.text,
+                padding: '10px 20px',
+                textDecoration: 'none',
+                borderRadius: '4px',
+                fontFamily: Theme.fontPrimary,
+                display: 'flex',
+                alignItems: 'center'
+            }}
+        >
+            <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
+            Donate
+        </Link>
                 <ActionButton onClick={handleShare}>
                     <ShareAltOutlined /> Share
                 </ActionButton>
