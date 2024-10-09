@@ -1,70 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react'; // Import React
+import styled from 'styled-components';
+import { RotatingLines } from 'react-loader-spinner';
+
+export const Theme = {
+  fontPrimary: "'Open Sans', sans-serif",
+  fontSecondary: "'Lato', sans-serif",
+  fontTertiary: "'Playfair Display', serif", // Fixed key name for consistency
+  primary: '#C9A86A', // Muted gold
+  secondary: '#8A7968', // Warm taupe
+  accent: '#D64C31', // Deep coral
+  background: '#0F1419', // Rich dark blue-gray
+  surface: '#1E2328', // Slightly lighter blue-gray
+  text: '#F2F2F2', // Off-white
+  textDark: '#A0A0A0', // Medium gray
+};
+
+const FullScreenContainer = styled.div`
+  position: fixed; /* Fixes the position to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width */
+  height: 100vh; /* Full height */
+  background-color: rgba(15, 20, 25, 0.5); /* Semi-transparent dark background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+  color: ${Theme.text}; /* Text color */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it appears on top of other elements */
+`;
 
 const Loading = ({ isLoading }) => {
-  const overlayStyle = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(15, 20, 25, 0.8)', // Dark background with transparency
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 999, // Ensure it appears above other content
-    opacity: isLoading ? 1 : 0,
-    transition: 'opacity 0.3s ease',
-  };
-
-  return (
-    <div style={overlayStyle}>
-      {isLoading && <ProgressBar />}
-    </div>
-  );
-};
-
-const ProgressBar = () => {
-  const [progress, setProgress] = useState(0);
-  const [amount, setAmount] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev < 100 ? prev + 1 : prev));
-      setAmount((prev) => (prev < 100 ? prev + Math.random() * 2 : prev));
-    }, 20); // Adjust the speed of progress and amount increment
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <div style={styles.amount}>${amount.toFixed(2)}</div>
-      <div style={styles.progressContainer}>
-        <div style={{ ...styles.progressBar, width: `${progress}%` }} />
-      </div>
-    </div>
-  );
-};
-
-const styles = {
-  amount: {
-    fontSize: '24px',
-    color: '#fff',
-    marginBottom: '10px',
-  },
-  progressContainer: {
-    width: '300px',
-    height: '30px',
-    backgroundColor: '#eee',
-    borderRadius: '5px',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#4CAF50', // Green color for the progress bar
-    transition: 'width 0.2s ease-in-out', // Smooth transition for the filling effect
-  },
+    return (
+        <>
+            {isLoading && ( // Use isLoading prop for conditional rendering
+                <FullScreenContainer>
+                    <RotatingLines
+                        height="40"
+                        width="40"
+                        radius="9"
+                        strokeColor={Theme.primary} // Use strokeColor instead of color
+                        ariaLabel="loading"
+                    />
+                </FullScreenContainer>
+            )}
+        </>
+    );
 };
 
 export default Loading;
