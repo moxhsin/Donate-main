@@ -10,6 +10,8 @@ import { Audio, RotatingLines } from 'react-loader-spinner';
 import { Progress } from 'antd';
 import { Link } from 'react-router-dom';
 import { color } from 'three/webgpu';
+import formatDate from './../../utils/DateFormatter';
+import ImageUpload from '../../utils/ImageUpload';
 
 
 
@@ -235,9 +237,25 @@ const StyledForm = styled(Form)`
   }
 `;
 
+const StyledFormLabel = styled(Form.Label)`
+  color: ${Theme.text};
+  font-weight: 500;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  width: 100%;
+  text-align:left
+`;
+
 const StyledButton = styled(Button)`
   background-color: ${Theme.accent};
   border-color: ${Theme.accent};
+`;
+
+const FormContainer = styled.div`
+    display: flex; /* Use flexbox */
+    align-items: center; /* Center items vertically */
+    gap: 10px; /* Space between the label and input */
+    margin-top: 20px;
 `;
 
 const DonateDetails = ({ match }) => {
@@ -251,9 +269,12 @@ const DonateDetails = ({ match }) => {
     const [topDonor, setTopDonor] = useState(null);
     const [isCommentEnabled, setIsCommentEnabled] = useState(false);
     const [showModalAll, setShowModalAll] = useState(false);
-const [showModalTop, setShowModalTop] = useState(false);
-const [viewAll, setViewAll] = useState('newest'); // State for All Donations view
-const [viewTop, setViewTop] = useState('top'); // State for Top Donors view
+    const [showModalTop, setShowModalTop] = useState(false);
+    const [viewAll, setViewAll] = useState('newest'); // State for All Donations view
+    const [viewTop, setViewTop] = useState('top'); // State for Top Donors view
+    const [isCampaignUserLoggedIn, setIsCampaignUserLoggedIn] = useState('false');
+    const [newUpdate, setNewUpdate] = useState('');
+    const [images, setImages] = useState([]);
 
 const handleShowAll = () => {
     setViewAll('newest'); // Reset to newest when opening modal
@@ -278,10 +299,12 @@ const handleCloseTop = () => setShowModalTop(false);
     const loadCampaignDetails = async () => {
         setIsLoading(true);
         try {
-            const res = await API.getAllCampaigns();
-            const campaignDetails = res.data.find(campaign => campaign._id === id);
+            const res = await API.getCampaignById(id);
+            const campaignDetails = res.data;
             if (campaignDetails) {
                 setCampaign(campaignDetails);
+                const userData = JSON.parse(sessionStorage.getItem('userData'));
+                setIsCampaignUserLoggedIn(userData ? userData.email == campaignDetails.createdUserEmail : false);
                 const donations = campaignDetails.donations || [];
                 const topDonor = donations.reduce((max, donor) =>
                     donor.amount > max.amount ? donor : max,
@@ -312,6 +335,29 @@ const handleCloseTop = () => setShowModalTop(false);
         } catch (error) {
             console.error("Error fetching comments:", error);
             alert("There was an error fetching comments. Please try again.");
+        }
+    };
+
+    const handleUpdateSubmit = async (e) => {
+        e.preventDefault();
+    
+        if (newUpdate.trim()) {
+            const updateObject = {
+                update: newUpdate,
+                images: images
+            };
+    
+            try {
+                await API.addUpdateInCampaign(id, updateObject);
+                setNewUpdate('');
+                setImages([]);
+                loadCampaignDetails();
+            } catch (error) {
+                console.error('Error submitting update:', error);
+                alert('There was an error submitting your update. Please try again.');
+            }
+        } else {
+            alert('Please enter an update and select at least one image before submitting.');
         }
     };
 
@@ -348,6 +394,10 @@ const handleCloseTop = () => setShowModalTop(false);
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const handleImageUpload = (url) => {
+        setImages(prevImages => [...prevImages, url]);
+    };
 
     const handleShare = async () => {
         if (!campaign) {
@@ -398,24 +448,7 @@ const handleCloseTop = () => setShowModalTop(false);
     };
 
     if (isLoading || !campaign) {
-        return (
-            <ResponsiveContainer fluid style={{
-                backgroundColor: Theme.background,
-                color: Theme.text,
-                height: '100vh', // Take up full viewport height
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <RotatingLines
-                    height="40"
-                    width="40"
-                    radius="9"
-                    strokeColor={Theme.primary} // Use strokeColor instead of color
-                    ariaLabel="loading"
-                />
-            </ResponsiveContainer>
-        );
+        return (<Loading isLoading={isLoading} />);
     }
     const MobileOnlyComponent = styled.div`
   display: none;
@@ -454,6 +487,79 @@ const handleCloseTop = () => setShowModalTop(false);
                                     <strong style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>Description:</strong> {campaign.description}
                                 </Description>
                                 <Divider />
+                                {isCampaignUserLoggedIn && (
+                                    <>
+                                        <h4 style={{ color: Theme.primary, textAlign: 'left' }}>Add New Updates</h4>
+                                        <StyledForm onSubmit={handleUpdateSubmit}>
+                                            <Form.Group controlId="newUpdate">
+                                                <Form.Control
+                                                    as="textarea"
+                                                    rows={3}
+                                                    placeholder="Add update..."
+                                                    value={newUpdate}
+                                                    onChange={(e) => setNewUpdate(e.target.value)}
+                                                />
+                                            </Form.Group>
+                                            <StyledButton type="submit">
+                                                Add Update
+                                            </StyledButton>
+                                        </StyledForm>
+                                        <StyledForm>
+                                            <FormContainer>
+                                                <StyledFormLabel>Upload images for your update</StyledFormLabel>
+                                                <ImageUpload onImageUpload={handleImageUpload} />
+                                            </FormContainer>
+                                            {images.length > 0 && (
+                                                <div>
+                                                    <h2 style={{ color: Theme.primary, textAlign: 'left' }}>Uploaded Image:</h2>
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                                        {images.map((image, index) => (
+                                                            <div key={index} style={{ width: '150px', height: '150px', overflow: 'hidden' }}>
+                                                                <img
+                                                                    src={image} // Create a local URL for the image
+                                                                    alt={`Uploaded Image ${index + 1}`}
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </StyledForm>
+                                        <Divider />
+                                    </> 
+                                )}
+                                {campaign.updates.length > 0 && (
+                                    <>
+                                        <h4 style={{ color: Theme.primary, textAlign: 'left' }}>Updates</h4>
+                                        {campaign.updates.map((update, index) => (
+                                            <div key={index} style={{ marginBottom: '20px' }}> {/* Add margin for separation */}
+                                                <Description>
+                                                    <strong style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>
+                                                        {formatDate(update.createdOn)}:
+                                                    </strong>
+                                                    {update.update}
+                                                </Description>
+
+                                                {/* Check if there are images associated with the update */}
+                                                {update.images && update.images.length > 0 && (
+                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                                                        {update.images.map((imageUrl, imgIndex) => (
+                                                            <div key={imgIndex} style={{ width: '150px', height: '150px', overflow: 'hidden' }}>
+                                                                <img
+                                                                    src={imageUrl} // Use the image URL directly
+                                                                    alt={`Update Image ${index + 1}-${imgIndex + 1}`}
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <Divider />
+                                    </> 
+                                )}
                                 <p style={{ textAlign: 'left' }}>
                                     <strong style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>Contact The Creator: </strong> {campaign.createdUserEmail}
                                 </p>
@@ -706,22 +812,22 @@ const handleCloseTop = () => setShowModalTop(false);
                 </ResponsiveRow></PageContainer>
             <StickyBottomBar show={showStickyBar}>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <Link
-            to={`/donation?id=${id}`}
-            style={{
-                backgroundColor: Theme.accent,
-                color: Theme.text,
-                padding: '10px 20px',
-                textDecoration: 'none',
-                borderRadius: '4px',
-                fontFamily: Theme.fontPrimary,
-                display: 'flex',
-                alignItems: 'center'
-            }}
-        >
-            <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
-            Donate
-        </Link>
+                    <Link
+                        to={`/donation?id=${id}`}
+                        style={{
+                            backgroundColor: Theme.accent,
+                            color: Theme.text,
+                            padding: '10px 20px',
+                            textDecoration: 'none',
+                            borderRadius: '4px',
+                            fontFamily: Theme.fontPrimary,
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <DollarOutlined style={{ marginRight: '8px', color: Theme.text }} />
+                        Donate
+                    </Link>
                 <ActionButton onClick={handleShare}>
                     <ShareAltOutlined /> Share
                 </ActionButton>

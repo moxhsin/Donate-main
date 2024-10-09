@@ -164,6 +164,13 @@ const CreateCampaign = () => {
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
+        if (name == 'goal') {
+            const newValue = event.target.value;
+            // Allow only numbers (optional)
+            if (!(/^\d*$/.test(newValue))) {
+                return;
+            }
+        }
         setFormData(prevState => ({
             ...prevState,
             [name]: type === 'checkbox' ? checked : value
@@ -264,7 +271,7 @@ const CreateCampaign = () => {
                     <StyledFormGroup>
                         <StyledFormLabel>Goal Amount</StyledFormLabel>
                         <StyledFormControl
-                            type="number"
+                            type="text"
                             name="goal"
                             value={formData.goal}
                             onChange={handleInputChange}
