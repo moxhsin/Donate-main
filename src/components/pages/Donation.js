@@ -88,7 +88,6 @@ const InputField = styled.input`
         color: #ccc; 
     }
 `;
-
 const AmountButtonContainer = styled.div`
     display: flex; 
     justify-content: space-between; /* Distribute space evenly */
@@ -255,6 +254,14 @@ const Donation = (props) => {
       setTip(((donationAmount * e.target.value) / 100).toFixed(2))
     } 
 
+    const handleChange = (event) => {
+        const newValue = event.target.value;
+        // Allow only numbers (optional)
+        if (/^\d*$/.test(newValue)) {
+            setDonationAmount(newValue);
+        }
+    };
+
     const handleDonate = async () => {
         if (!donationAmount || donationAmount <= 0) {
             alert("Please enter a valid donation amount greater than zero.");
@@ -304,7 +311,7 @@ const Donation = (props) => {
                          </label>
                          <label>
                              Donation Amount:
-                             <InputField type="number" value={donationAmount} onChange={(e) => setDonationAmount(e.target.value)} placeholder="Enter amount" />
+                             <InputField type="text" value={donationAmount} onChange={handleChange} placeholder="Enter amount" />
                          </label>
                          </div>        
                          
