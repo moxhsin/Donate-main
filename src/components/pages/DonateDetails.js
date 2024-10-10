@@ -12,6 +12,8 @@ import { Link } from 'react-router-dom';
 import { color } from 'three/webgpu';
 import formatDate from './../../utils/DateFormatter';
 import ImageUpload from '../../utils/ImageUpload';
+import 'react-image-lightbox/style.css'; // Import the CSS for the lightbox
+import Lightbox from 'react-image-lightbox';
 
 
 
@@ -275,6 +277,16 @@ const DonateDetails = ({ match }) => {
     const [isCampaignUserLoggedIn, setIsCampaignUserLoggedIn] = useState('false');
     const [newUpdate, setNewUpdate] = useState('');
     const [images, setImages] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [currentUpdateImages, setCurrentUpdateImages] = useState([]);
+
+
+    const openLightbox = (index, images) => {
+        setCurrentImageIndex(index);
+        setCurrentUpdateImages(images); // Store the images of the current update
+        setIsOpen(true);
+    };
 
 const handleShowAll = () => {
     setViewAll('newest'); // Reset to newest when opening modal
@@ -530,35 +542,52 @@ const handleCloseTop = () => setShowModalTop(false);
                                     </> 
                                 )}
                                 {campaign.updates.length > 0 && (
-                                    <>
-                                        <h4 style={{ color: Theme.primary, textAlign: 'left' }}>Updates</h4>
-                                        {campaign.updates.map((update, index) => (
-                                            <div key={index} style={{ marginBottom: '20px' }}> {/* Add margin for separation */}
-                                                <Description>
-                                                    <strong style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>
-                                                        {formatDate(update.createdOn)}:
-                                                    </strong>
-                                                    {update.update}
-                                                </Description>
+                                   <>
+            <h4 style={{ color: Theme.primary, textAlign: 'left' }}>Updates</h4>
+            {campaign.updates.map((update, index) => (
+                <div key={index} style={{ marginBottom: '20px' }}>
+                    <Description>
+                        <strong style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>
+                            {formatDate(update.createdOn)}:
+                        </strong>
+                        {update.update}
+                    </Description>
 
-                                                {/* Check if there are images associated with the update */}
-                                                {update.images && update.images.length > 0 && (
-                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
-                                                        {update.images.map((imageUrl, imgIndex) => (
-                                                            <div key={imgIndex} style={{ width: '150px', height: '150px', overflow: 'hidden' }}>
-                                                                <img
-                                                                    src={imageUrl} // Use the image URL directly
-                                                                    alt={`Update Image ${index + 1}-${imgIndex + 1}`}
-                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                        <Divider />
-                                    </> 
+                    {/* Check if there are images associated with the update */}
+                    {update.images && update.images.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                            {update.images.map((imageUrl, imgIndex) => (
+                                <div key={imgIndex} style={{ width: '150px', height: '150px', overflow: 'hidden' }}>
+                                    <img
+                                        src={imageUrl}
+                                        alt={`Update Image ${index + 1}-${imgIndex + 1}`}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+                                        onClick={() => openLightbox(imgIndex, update.images)} // Open lightbox on click
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ))}
+            <Divider />
+
+            {/* Lightbox Component */}
+            {isOpen && currentUpdateImages.length > 0 && (
+                <Lightbox
+                    mainSrc={currentUpdateImages[currentImageIndex]}
+                    nextSrc={currentUpdateImages[(currentImageIndex + 1) % currentUpdateImages.length]}
+                    prevSrc={currentUpdateImages[(currentImageIndex + currentUpdateImages.length - 1) % currentUpdateImages.length]}
+                    onCloseRequest={() => setIsOpen(false)}
+                    onMovePrevRequest={() =>
+                        setCurrentImageIndex((currentImageIndex + currentUpdateImages.length - 1) % currentUpdateImages.length)
+                    }
+                    onMoveNextRequest={() =>
+                        setCurrentImageIndex((currentImageIndex + 1) % currentUpdateImages.length)
+                    }
+                />
+            )}
+        </>
                                 )}
                                 <p style={{ textAlign: 'left' }}>
                                     <strong style={{ color: Theme.primary, fontFamily: Theme.fontPrimary }}>Contact The Creator: </strong> {campaign.createdUserEmail}

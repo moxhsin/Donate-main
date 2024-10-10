@@ -31,12 +31,22 @@ const Container = styled.div`
     margin: auto;
     z-index: 1; /* Above the video */
     margin-top: 225px;
+
+    @media (max-width: 600px) {
+        width: 90%; /* Make container responsive on small screens */
+        margin-top: 150px; /* Adjust margin for smaller screens */
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
 `;
 
 const Title = styled.h1`
     font-family: 'Playfair Display', serif;
     text-align: center;
     color: #C9A86A;
+
+    @media (max-width: 600px) {
+        font-size: 24px; /* Adjust font size for smaller screens */
+    }
 `;
 
 const Form = styled.form`
@@ -61,6 +71,11 @@ const Input = styled.input`
     &::placeholder {
         color: #A0A0A0;
     }
+
+    @media (max-width: 600px) {
+        padding: 8px; /* Adjust padding for smaller screens */
+        font-size: 14px; /* Adjust font size for smaller screens */
+    }
 `;
 
 const Button = styled.button`
@@ -74,6 +89,11 @@ const Button = styled.button`
 
     &:hover {
         background-color: #C94C31; /* Darker shade on hover */
+    }
+
+    @media (max-width: 600px) {
+        padding: 8px; /* Adjust padding for smaller screens */
+        font-size: 16px; /* Adjust font size for smaller screens */
     }
 `;
 
@@ -89,7 +109,6 @@ const SignIn = (props) => {
     };
 
     const decodeJwt = (token) => {
-        // Split the token into parts
         const base64Url = token.split('.')[1]; // Get the payload part
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Replace URL safe characters
         const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
@@ -99,8 +118,7 @@ const SignIn = (props) => {
         return JSON.parse(jsonPayload); // Parse JSON string to object
     };
     
-    // Example usage in your SignIn component
-    const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await API.login(credentials);
@@ -108,7 +126,6 @@ const SignIn = (props) => {
                 const token = response.data.token; // Assuming token is in response.data.token
                 const decodedPayload = decodeJwt(token); // Decode the JWT
                 
-                // Store user data in session storage
                 sessionStorage.setItem('userData', JSON.stringify(decodedPayload)); 
                 console.log('Sign In successful:', decodedPayload);
                 
@@ -118,41 +135,41 @@ const SignIn = (props) => {
             console.error('Error signing in:', error);
             // Handle error (e.g., show an error message)
         }
-    };
+   };
 
-    return (
-        <FullPageBackground>
-            <BackgroundVideo autoPlay loop muted playsInline>
-                <source src={video} type="video/mp4"/>
-            </BackgroundVideo>
-            <Container>
-                <Title>Sign In</Title>
-                <Form onSubmit={handleSubmit}>
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        value={credentials.email} 
-                        onChange={handleChange} 
-                        required 
-                    />
-                    
-                    <Label htmlFor="password">Password</Label>
-                    <Input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        value={credentials.password} 
-                        onChange={handleChange} 
-                        required 
-                    />
-                    
-                    <Button type="submit">Sign In</Button>
-                </Form>
-            </Container>
-        </FullPageBackground>
-    );
+   return (
+       <FullPageBackground>
+           <BackgroundVideo autoPlay loop muted playsInline>
+               <source src={video} type="video/mp4"/>
+           </BackgroundVideo>
+           <Container>
+               <Title>Sign In</Title>
+               <Form onSubmit={handleSubmit}>
+                   <Label htmlFor="email">Email</Label>
+                   <Input 
+                       type="email" 
+                       id="email" 
+                       name="email" 
+                       value={credentials.email} 
+                       onChange={handleChange} 
+                       required 
+                   />
+                   
+                   <Label htmlFor="password">Password</Label>
+                   <Input 
+                       type="password" 
+                       id="password" 
+                       name="password" 
+                       value={credentials.password} 
+                       onChange={handleChange} 
+                       required 
+                   />
+                   
+                   <Button type="submit">Sign In</Button>
+               </Form>
+           </Container>
+       </FullPageBackground>
+   );
 };
 
 export default withRouter(SignIn); // Export withRouter

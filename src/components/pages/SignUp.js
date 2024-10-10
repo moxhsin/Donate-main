@@ -10,6 +10,10 @@ const FullPageBackground = styled.div`
     position: relative;
     height: 100vh; /* Full height of the viewport */
     overflow: hidden; /* Hide overflow */
+
+    @media (max-width: 768px) {
+        height: auto; /* Allow height to adjust on smaller screens */
+    }
 `;
 
 const BackgroundVideo = styled.video`
@@ -32,12 +36,23 @@ const Container = styled.div`
     margin: auto;
     margin-top: 140px; /* Center vertically */
     z-index: 1; /* Above the video */
+
+    @media (max-width: 768px) {
+        width: 90%; /* Make it responsive on smaller screens */
+        margin-top: 102px; /* Adjust top margin for better positioning */
+        margin-bottom: 60px; /* Add bottom margin to prevent overlap with footer */
+        padding: 15px; /* Slightly reduce padding */
+    }
 `;
 
 const Title = styled.h1`
     font-family: 'Playfair Display', serif;
     text-align: center;
     color: #C9A86A;
+
+    @media (max-width: 768px) {
+        font-size: 24px; /* Adjust font size for mobile */
+    }
 `;
 
 const Form = styled.form`
@@ -54,15 +69,20 @@ const Input = styled.input`
     width: 100%;
     padding: 10px;
     border-radius: 4px;
-    background-color: #F2F2F2;
+    background-color: #8A7968;
     color: #000000;
     margin-bottom: 15px;
 
     &::placeholder {
-        color: #A0A0A0;
+        color: black;
     }
 
     border-color: ${props => (props.error ? 'red' : 'transparent')};
+
+    @media (max-width: 768px) {
+        padding: 8px; /* Slightly reduce padding for mobile */
+        font-size: 14px; /* Adjust font size for mobile */
+    }
 `;
 
 const Button = styled.button`
@@ -75,6 +95,11 @@ const Button = styled.button`
 
     &:hover {
         background-color: #C94C31; /* Darker shade on hover */
+    }
+
+    @media (max-width: 768px) {
+        padding: 8px; /* Slightly reduce padding for mobile */
+        font-size: 16px; /* Adjust font size for mobile */
     }
 `;
 
